@@ -3,6 +3,7 @@ import './styles.css';
 import { Component } from 'react';
 import Posts from '../../Posts';
 import { loadPosts } from '../../../utils/load-posts';
+import Button from '../../Button';
 
 export class Home extends Component {
   state = {
@@ -25,12 +26,32 @@ export class Home extends Component {
     });
   }
 
+  loadMorePosts = ()=> {
+    const {
+      page,
+      postsPerPage,
+      allPosts,
+      posts
+    } = this.state;
+    const nextPage = page + postsPerPage;
+    const nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
+
+    posts.push(...nextPosts)
+
+    this.setState({posts, page: nextPage});
+  }
+
   render() {
     const { posts } = this.state;
 
       return (
         <section className="container">
           <Posts posts={posts} />
+          <Button 
+            text="Mais posts"
+            handleClick={this.loadMorePosts}
+            />
+      
         </section>
       );
   }
