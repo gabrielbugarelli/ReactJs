@@ -1,5 +1,14 @@
-export default function Button({text, handleClick}){
+import './style.css'
+import React from 'react';
+
+export default function Button({text, handleClick, disabled}){
   return(
-    <button onClick={handleClick}> {text} </button>
+    <button 
+      className='button' 
+      onClick={handleClick}
+      disabled={disabled}
+      > 
+      {text} 
+    </button>
   )
 }
