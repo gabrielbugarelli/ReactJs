@@ -4,7 +4,7 @@
   font-size: 2vh;
   border: none;
   outline: none;
-  box-shadow: 1px 1px 5px black;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.548);
 }
 
 .text-input:hover {

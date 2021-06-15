@@ -5,6 +5,7 @@ export default function TextInput(props){
 
   return(
     <input
+      autoFocus
       className='text-input'
       onChange={handleChange} 
       searchValue={value}
