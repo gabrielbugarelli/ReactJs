@@ -1,0 +1,12 @@
+.text-input {
+  width: 30%;
+  padding: 0.6vh;
+  font-size: 2vh;
+  border: none;
+  outline: none;
+  box-shadow: 1px 1px 5px black;
+}
+
+.text-input:hover {
+  padding: 1vh;
+}
