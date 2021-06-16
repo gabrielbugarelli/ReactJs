@@ -10,7 +10,7 @@ export default function Posts ({posts}){
             key={post.id}
             cover={post.cover}
             id={post.id}
-            title={post.tle}
+            title={post.title}
             body={post.body}
           />
         ))
