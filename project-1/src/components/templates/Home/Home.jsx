@@ -1,96 +1,84 @@
 import './styles.css';
 
-import { Component } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Posts from '../../Posts';
 import { loadPosts } from '../../../utils/load-posts';
 import Button from '../../Button';
 import TextInput from '../../TextInput';
 
-export class Home extends Component {
-  state = {
-    posts: [], 
-    allPosts: [],
-    page: 0,
-    postsPerPage: 8,
-    searchValue: ''
-  };
+export default function Home () {
+  const [posts, setPosts] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [postsPerPage] = useState(8);
+  const [searchValue, setSearchValue] = useState('');
+  
+  const noMorePosts = page + postsPerPage >= allPosts.length;
 
-  async componentDidMount() {
-    await this.loadPosts();
-  }
-
-  loadPosts = async () => {
-    const {page, postsPerPage} = this.state
-    const postsAndPhotos = await loadPosts();
-    this.setState({ 
-      posts: postsAndPhotos.slice(page, postsPerPage),
-      allPosts: postsAndPhotos
-    });
-  }
-
-  loadMorePosts = ()=> {
-    const {
-      page,
-      postsPerPage,
-      allPosts,
-      posts
-    } = this.state;
-    const nextPage = page + postsPerPage;
-    const nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
-
-    posts.push(...nextPosts)
-
-    this.setState({posts, page: nextPage});
-  }
-
-  handleChange =(e)=>{
-    const {value} = e.target;
-    this.setState({searchValue:value})
-  }
-
-  render() {
-    const { posts, page, postsPerPage, allPosts, searchValue } = this.state;
-    const noMorePosts = page + postsPerPage >= allPosts.length;
-    
-    const filteredPosts = !!searchValue ? 
+  const filteredPosts = !!searchValue ? 
         posts.filter(post=>{
           return post.title.toLowerCase().includes(
             searchValue.toLowerCase());
         })
       : posts;
 
-      return (
-        <section className="container">
-          <div className="search-container">
-            {!!searchValue && (
-              <h1>Search value: {searchValue}</h1>
-            )}
+  const handleLoadPosts = useCallback(async (page, postsPerPage) => {
+    const postsAndPhotos = await loadPosts();
 
-            <TextInput
-              handleChange={this.handleChange} 
-              type="search" 
-              searchValue={searchValue}
-            />
-          </div>
+    setPosts(postsAndPhotos.slice(page, postsPerPage));
+    setAllPosts(postsAndPhotos);
+  }, []);
 
-          {filteredPosts.length > 0 && (
-            <Posts posts={filteredPosts} />
-          )}
-          {filteredPosts.length === 0 && (
-            <p>Post não encontrado :( </p>
-          )}
+  useEffect(() =>{
+    handleLoadPosts(0, postsPerPage);
+  }, [handleLoadPosts, postsPerPage]);
 
-          <div className="button-container">
-            {!searchValue && (
-              <Button 
-                text="Mais posts"
-                handleClick={this.loadMorePosts}
-                disabled={noMorePosts}
-              />
-            )}
-          </div>
-      
-        </section>
-      );
+  const loadMorePosts = ()=> {
+      const nextPage = page + postsPerPage;
+      const nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
+      posts.push(...nextPosts)
+
+      setPosts(posts);
+      setPage(nextPage);
+    }
+  
+  const handleChange =(e)=>{
+      const {value} = e.target;
+      setSearchValue(value);
   }
+
+  return (
+      <section className="container">
+        <div className="search-container">
+          {!!searchValue && (
+            <h1>Search value: {searchValue}</h1>
+          )}
+
+          <TextInput
+            handleChange={handleChange} 
+            type="search" 
+            searchValue={searchValue}
+          />
+        </div>
+
+        {filteredPosts.length > 0 && (
+          <Posts posts={filteredPosts} />
+        )}
+
+        {filteredPosts.length === 0 && (
+          <p>Post não encontrado :( </p>
+        )}
+
+        <div className="button-container">
+          {!searchValue && (
+            <Button 
+              text="Mais posts"
+              handleClick={loadMorePosts}
+              disabled={noMorePosts}
+            />
+          )}
+        </div>
+    
+      </section>
+    );
 }
